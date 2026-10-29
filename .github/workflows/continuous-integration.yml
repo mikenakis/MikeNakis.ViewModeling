@@ -1,0 +1,77 @@
+name: continuous-integration
+
+on:
+  push:
+    # PEARL: GitHub will execute an "on: push" workflow twice, on the exact same commit, if we push both files and tags
+    #    using a command like `git push origin HEAD  --tags`. Several hours of troubleshooting and trying various tricks
+    #    yielded no solution: the '--atomic' option has no effect, either with '--tags' or with the explicit tag name.
+    #    The only solution seems to be to specify that the workflow must run on branches, which excludes tags.
+    branches:
+      - "**"
+
+jobs:
+
+  the_job:
+
+    runs-on: ubuntu-latest
+    # runs-on: windows-latest
+
+    # PEARL: In a GitHub Action, if you try to git-push you get a 403 permission denied error.
+    #        The following fixes this problem.
+    permissions:
+      contents: write
+      # Needed by the "NuGet login" step below, which requests an OIDC token from GitHub.
+      id-token: write
+
+    env:
+      # PEARL: In a GitHub Action, the output of `dotnet build` looks very different from what it looks when building
+      #        locally. For example, the output of "Message" tasks is not shown, even with Importance="High".
+      #        The "-ConsoleLoggerParameters:off" magical incantation corrects this problem.
+      # PEARL-ON-PEARL: The "-ConsoleLoggerParameters:off" magical incantation does not work when building locally; it
+      #        only works on GitHub.
+      # The "-TerminalLogger:off" magical incantation works both when building locally and on GitHub, and it also comes
+      # in the form of a convenient 'MSBUILDTERMINALLOGGER' environment variable.
+      MSBUILDTERMINALLOGGER: off
+
+    steps:
+
+    - name: Checkout
+      uses: actions/checkout@v7
+
+    # PEARL: In a GitHub Action, if you try to perform any git operation that relies on the history of the repository
+    #        being present, that operation will fail. The following fixes this problem.
+    - name: Unshallow
+      run: git fetch --prune --unshallow
+
+    # PEARL: In a GitHub Action, if you try to git-commit, you get an "Author identity unknown" error.
+    #        The following fixes this problem.
+    - name: Identify
+      run: |
+        git config user.email "${{ github.actor }}@github.com"
+        git config user.name "${{ github.actor }}"
+
+    # Under normal circumstances, the "Setup dotnet" step is unnecessary because the runner image already
+    # comes with a .NET SDK preinstalled.
+    # If a future runner image ships a newer SDK that can no longer build our projects, comment the step
+    # back in, specifying a `dotnet-version` that works.
+    # - name: Setup dotnet
+    #   uses: actions/setup-dotnet@v6
+    #   with:
+    #     dotnet-version: 9.0.200
+
+    # NuGet "Trusted Publishing": exchange GitHub's OIDC token for a short-lived nuget.org API key, so that no
+    # long-lived (and expiring) API key needs to be stored as a secret. This requires a Trusted Publishing policy on
+    # nuget.org for this repository and this workflow file. The key is only needed when publishing to nuget.org, which
+    # happens on "Release of version X.Y.0" commits; see `get_publishing_destination` in continuous-integration.bash.
+    - name: NuGet login
+      id: nuget_login
+      if: startsWith(github.event.head_commit.message, 'Release of version ') && endsWith(github.event.head_commit.message, '.0')
+      uses: NuGet/login@v1
+      with:
+        user: MikeNakis
+
+    - name: Run the actual continuous integration script
+      run: |
+        bash continuous-integration.bash --project-name=${{ github.event.repository.name }} \
+          --github-packages-nuget-api-key=${{ secrets.MY_GITHUB_TOKEN }} \
+          --nuget-org-nuget-api-key=${{ steps.nuget_login.outputs.NUGET_API_KEY }}

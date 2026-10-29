@@ -1,0 +1,63 @@
+<Project Sdk="Microsoft.NET.Sdk" InitialTargets="VersioningTarget">
+
+	<PropertyGroup>
+		<TargetFramework>net10.0</TargetFramework>
+		<LangVersion>Default</LangVersion>
+		<Configurations>Debug;Optimized;Release;Develop</Configurations>
+		<!-- AssemblyName: The default is $(MSBuildProjectName) -->
+		<AssemblyName>$(MSBuildProjectName)-$(Configuration)</AssemblyName>
+
+		<!-- _____ Packaging _____ -->
+
+		<!-- Title: the default appears to be $(MSBuildProjectName) if equal to $(AssemblyName), blank otherwise. -->
+		<Title>$(MSBuildProjectName) ($(Configuration))</Title>
+		<Authors>MikeNakis</Authors>
+		<Description>Building blocks for view models (MVVM) that do not depend on any GUI framework</Description>
+		<Copyright>Copyright © Mike Nakis. All rights reserved.</Copyright>
+		<PackageIcon>MikeNakis.ViewModeling-Logo.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/mikenakis/MikeNakis.ViewModeling.git</RepositoryUrl>
+		<PublishRepositoryUrl>True</PublishRepositoryUrl>
+		<PackageTags>dotnet; dotnet-core; mvvm; view-model</PackageTags>
+		<PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<PackageReleaseNotes>initial release</PackageReleaseNotes>
+		<IncludeSymbols Condition="'$(Configuration)' == 'Release'">True</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<Import Project="..\AllProjects.proj.xml" />
+	<Import Project="..\BannedApiAnalyzers.proj.xml" />
+
+	<Target Name="PrepareForPack" BeforeTargets="Pack">
+		<Error Condition="'$(PackageVersion)' == '1.0.0'" Text="PackageVersion is '1.0.0', which probably means it was not supplied." />
+	</Target>
+
+	<ItemGroup>
+		<!-- PEARL: Visual Studio will show these items in "Solution Explorer", as if they are in the project directory,
+		    even though they are NOT. The "Visible=false" magical incantation is necessary to prevent this. -->
+		<None Include="..\LICENSE.md" Pack="True" PackagePath="/" Visible="False" />
+		<None Include="..\MikeNakis.ViewModeling-Logo.png" Pack="True" PackagePath="/" Visible="False" />
+		<None Include="..\README-for-nuget.md" Pack="True" PackagePath="/README.md" Visible="False" />
+	</ItemGroup>
+
+	<!-- PEARL: Dotnet does not support swapping between package and project dependencies. The following nonsense is
+	            necessary to work around this limitation. See https://github.com/dotnet/project-system/issues/195 -->
+	<Choose>
+		<When Condition="Exists('$(MSBuildProjectDirectory)\..\..\MikeNakis.Kit\MikeNakis.Kit\MikeNakis.Kit.csproj')">
+			<ItemGroup>
+				<ProjectReference Include="$(MSBuildProjectDirectory)\..\..\MikeNakis.Kit\MikeNakis.Kit\MikeNakis.Kit.csproj" />
+			</ItemGroup>
+		</When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="MikeNakis.Kit-$(PackagesConfiguration)" Version="5.*" />
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
+
+	<ItemGroup>
+		<PackageReference Include="MikeNakis.CSharpTypeNames-$(PackagesConfiguration)" Version="2.*" PrivateAssets="compile;contentfiles;build;analyzers" />
+	</ItemGroup>
+
+</Project>

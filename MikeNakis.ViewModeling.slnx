@@ -1,0 +1,20 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug" />
+    <BuildType Name="Optimized" />
+    <BuildType Name="Develop" />
+    <BuildType Name="Release" />
+  </Configurations>
+  <Folder Name="/_Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path=".github/workflows/continuous-integration.yml" />
+    <File Path="common_files.txt" />
+    <File Path="LICENSE.md" />
+    <File Path="MikeNakis.ViewModeling-Logo.svg" />
+    <File Path="README.md" />
+    <File Path="version.txt" />
+  </Folder>
+  <Project Path="MikeNakis.ViewModeling.Fake/MikeNakis.ViewModeling.Fake.csproj" />
+  <Project Path="MikeNakis.ViewModeling.Wpf/MikeNakis.ViewModeling.Wpf.csproj" />
+  <Project Path="MikeNakis.ViewModeling/MikeNakis.ViewModeling.csproj" />
+</Solution>
