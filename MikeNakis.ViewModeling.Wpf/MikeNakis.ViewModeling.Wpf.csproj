@@ -4,6 +4,8 @@
 		<TargetFramework>net10.0-windows</TargetFramework>
 		<LangVersion>Default</LangVersion>
 		<UseWPF>true</UseWPF>
+		<!-- Allow building on Linux -->
+		<EnableWindowsTargeting>True</EnableWindowsTargeting>
 		<Configurations>Debug;Optimized;Release;Develop</Configurations>
 		<!-- AssemblyName: The default is $(MSBuildProjectName) -->
 		<AssemblyName>$(MSBuildProjectName)-$(Configuration)</AssemblyName>
