@@ -10,7 +10,6 @@
     <File Path=".github/workflows/continuous-integration.yml" />
     <File Path="common_files.txt" />
     <File Path="LICENSE.md" />
-    <File Path="MikeNakis.ViewModeling-Logo.svg" />
     <File Path="README.md" />
     <File Path="version.txt" />
   </Folder>

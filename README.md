@@ -1,7 +1,7 @@
 # MikeNakis.ViewModeling<br/><sub><sup>Building blocks for view models (MVVM) that do not depend on any GUI framework</sup></sub>
 
 <p align="center">
-  <img title="MikeNakis.ViewModeling Logo" src="MikeNakis.ViewModeling-Logo.svg" width="256" />
+  <img title="MikeNakis.ViewModeling Logo" src="MikeNakis.ViewModeling/MikeNakis.ViewModeling-icon.svg" width="256" />
 </p>
 
 [![Build](https://github.com/mikenakis/MikeNakis.ViewModeling/actions/workflows/continuous-integration.yml/badge.svg)](https://github.com/mikenakis/MikeNakis.ViewModeling/actions/workflows/continuous-integration.yml)

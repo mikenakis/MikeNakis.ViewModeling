@@ -15,3 +15,4 @@ get_version.bash
 ProductionCode.globalconfig
 TestCode.globalconfig
 release.bash
+dotnet-tools.json .config/dotnet-tools.json
